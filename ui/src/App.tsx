@@ -1,6 +1,8 @@
 import { useState, lazy, Suspense } from "react";
 import { Toast } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { ContractErrorBoundary } from "./components/ContractErrorBoundary";
+import { Skeleton } from "./components/Skeleton";
 import { OnboardingFlow, hasCompletedOnboarding } from "./components/OnboardingFlow";
 import type { ToastMessage } from "./components/Toast";
 
@@ -16,6 +18,10 @@ export default function App() {
   const [showOnboarding, setShowOnboarding] = useState(
     () => !hasCompletedOnboarding()
   );
+
+  // In a real app this would come from a wallet-connection context/hook.
+  // Kept as undefined here so the boundary still works without a connected wallet.
+  const walletAddress: string | undefined = undefined;
 
   const notify = (msg: ToastMessage) => setToast(msg);
 
@@ -56,19 +62,31 @@ export default function App() {
             className="tab-panel"
           >
             <Suspense fallback={<Skeleton rows={3} />}>
-              {tab === "deposit" && <DepositForm onToast={notify} />}
-              {tab === "withdraw" && <WithdrawForm onToast={notify} />}
-              {tab === "harvest" && <HarvestPanel onToast={notify} />}
+              {tab === "deposit" && (
+                <ContractErrorBoundary panelName="deposit" walletAddress={walletAddress}>
+                  <DepositForm onToast={notify} />
+                </ContractErrorBoundary>
+              )}
+              {tab === "withdraw" && (
+                <ContractErrorBoundary panelName="withdraw" walletAddress={walletAddress}>
+                  <WithdrawForm onToast={notify} />
+                </ContractErrorBoundary>
+              )}
+              {tab === "harvest" && (
+                <ContractErrorBoundary panelName="harvest" walletAddress={walletAddress}>
+                  <HarvestPanel onToast={notify} />
+                </ContractErrorBoundary>
+              )}
             </Suspense>
           </div>
         </main>
 
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
+        {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
 
-      {showOnboarding && (
-        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
-      )}
-    </div>
+        {showOnboarding && (
+          <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
+        )}
+      </div>
     </ErrorBoundary>
   );
 }
