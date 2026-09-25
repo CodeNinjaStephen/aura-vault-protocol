@@ -1,12 +1,20 @@
 import { useState, lazy, Suspense } from "react";
 import { Toast } from "./components/Toast";
 import { ErrorBoundary } from "./components/ErrorBoundary";
+import { SWRErrorBoundary } from "./components/SWRErrorBoundary";
 import { OnboardingFlow, hasCompletedOnboarding } from "./components/OnboardingFlow";
+import { Skeleton } from "./components/Skeleton";
 import type { ToastMessage } from "./components/Toast";
 
-const DepositForm = lazy(() => import("./components/DepositForm").then((m) => ({ default: m.DepositForm })));
-const WithdrawForm = lazy(() => import("./components/WithdrawForm").then((m) => ({ default: m.WithdrawForm })));
-const HarvestPanel = lazy(() => import("./components/HarvestPanel").then((m) => ({ default: m.HarvestPanel })));
+const DepositForm = lazy(() =>
+  import("./components/DepositForm").then((m) => ({ default: m.DepositForm }))
+);
+const WithdrawForm = lazy(() =>
+  import("./components/WithdrawForm").then((m) => ({ default: m.WithdrawForm }))
+);
+const HarvestPanel = lazy(() =>
+  import("./components/HarvestPanel").then((m) => ({ default: m.HarvestPanel }))
+);
 
 type Tab = "deposit" | "withdraw" | "harvest";
 
@@ -17,58 +25,71 @@ export default function App() {
     () => !hasCompletedOnboarding()
   );
 
+  // In a real app, the connected wallet address comes from a wallet adapter
+  // (e.g. Freighter, xBull). Stub to null until the user connects.
+  const [walletAddress] = useState<string | null>(null);
+
   const notify = (msg: ToastMessage) => setToast(msg);
 
   return (
-    <ErrorBoundary>
-      <div className="app">
-        <a href="#main" className="skip-link">
-          Skip to main content
-        </a>
+    // SWRErrorBoundary wraps the entire app as the global SWR provider.
+    // It catches any uncaught SWR fetch errors and renders a recovery UI.
+    <SWRErrorBoundary>
+      {/* Existing ErrorBoundary handles non-SWR render errors. */}
+      <ErrorBoundary>
+        <div className="app">
+          <a href="#main" className="skip-link">
+            Skip to main content
+          </a>
 
-        <header className="app-header" role="banner">
-          <h1>Aura Vault</h1>
-        </header>
+          <header className="app-header" role="banner">
+            <h1>Aura Vault</h1>
+          </header>
 
-        <main id="main" className="app-main">
-          <nav aria-label="Vault actions">
-            <div className="tab-list" role="tablist">
-              {(["deposit", "withdraw", "harvest"] as Tab[]).map((t) => (
-                <button
-                  key={t}
-                  role="tab"
-                  aria-selected={tab === t}
-                  aria-controls={`panel-${t}`}
-                  id={`tab-${t}`}
-                  className={`tab-btn${tab === t ? " tab-btn--active" : ""}`}
-                  onClick={() => setTab(t)}
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
+          <main id="main" className="app-main">
+            <nav aria-label="Vault actions">
+              <div className="tab-list" role="tablist">
+                {(["deposit", "withdraw", "harvest"] as Tab[]).map((t) => (
+                  <button
+                    key={t}
+                    role="tab"
+                    aria-selected={tab === t}
+                    aria-controls={`panel-${t}`}
+                    id={`tab-${t}`}
+                    className={`tab-btn${tab === t ? " tab-btn--active" : ""}`}
+                    onClick={() => setTab(t)}
+                  >
+                    {t.charAt(0).toUpperCase() + t.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </nav>
+
+            <div
+              id={`panel-${tab}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${tab}`}
+              className="tab-panel"
+            >
+              <Suspense fallback={<Skeleton rows={3} />}>
+                {tab === "deposit" && (
+                  <DepositForm onToast={notify} walletAddress={walletAddress} />
+                )}
+                {tab === "withdraw" && (
+                  <WithdrawForm onToast={notify} walletAddress={walletAddress} />
+                )}
+                {tab === "harvest" && <HarvestPanel onToast={notify} />}
+              </Suspense>
             </div>
-          </nav>
+          </main>
 
-          <div
-            id={`panel-${tab}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${tab}`}
-            className="tab-panel"
-          >
-            <Suspense fallback={<Skeleton rows={3} />}>
-              {tab === "deposit" && <DepositForm onToast={notify} />}
-              {tab === "withdraw" && <WithdrawForm onToast={notify} />}
-              {tab === "harvest" && <HarvestPanel onToast={notify} />}
-            </Suspense>
-          </div>
-        </main>
+          {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
 
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
-
-      {showOnboarding && (
-        <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
-      )}
-    </div>
-    </ErrorBoundary>
+          {showOnboarding && (
+            <OnboardingFlow onComplete={() => setShowOnboarding(false)} />
+          )}
+        </div>
+      </ErrorBoundary>
+    </SWRErrorBoundary>
   );
 }

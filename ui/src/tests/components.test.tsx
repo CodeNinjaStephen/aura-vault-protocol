@@ -246,10 +246,26 @@ describe("ErrorBoundary", () => {
   });
 
   it("try again button resets error state", async () => {
-    const { rerender } = render(<ErrorBoundary><ThrowError /></ErrorBoundary>);
+    // shouldRecover controls whether the component throws.
+    // We start in error mode; after clicking "try again" we flip to recovery mode.
+    const state = { shouldThrow: true };
+    const Controlled = () => {
+      if (state.shouldThrow) throw new Error("controlled boom");
+      return <p>recovered</p>;
+    };
+
+    const { rerender } = render(
+      <ErrorBoundary><Controlled /></ErrorBoundary>
+    );
+    // Error boundary should have caught and shown the fallback UI
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    // Allow recovery before clicking "try again"
+    state.shouldThrow = false;
     await userEvent.click(screen.getByRole("button", { name: /try again/i }));
-    // After reset, no alert visible (boundary re-renders children without error now)
+
     expect(screen.queryByText(/something went wrong/i)).toBeNull();
+    expect(screen.getByText("recovered")).toBeInTheDocument();
   });
 });
 
@@ -297,6 +313,8 @@ describe("Skeleton", () => {
 // App — tab navigation
 // ---------------------------------------------------------------------------
 describe("App tab navigation", () => {
+  afterEach(() => { vi.useRealTimers(); });
+
   it("renders all three tab buttons", () => {
     render(<App />);
     expect(screen.getByRole("tab", { name: /deposit/i })).toBeInTheDocument();
@@ -309,28 +327,29 @@ describe("App tab navigation", () => {
     expect(screen.getByRole("tab", { name: /deposit/i })).toHaveAttribute("aria-selected", "true");
   });
 
-  it("shows DepositForm by default", () => {
+  it("shows DepositForm by default", async () => {
     render(<App />);
-    expect(screen.getByRole("heading", { name: /deposit/i })).toBeInTheDocument();
+    // Lazy-loaded form resolves after Suspense; wait for it
+    expect(await screen.findByRole("heading", { name: /deposit/i })).toBeInTheDocument();
   });
 
   it("clicking withdraw tab shows WithdrawForm", async () => {
     render(<App />);
     await userEvent.click(screen.getByRole("tab", { name: /withdraw/i }));
-    expect(screen.getByRole("heading", { name: /withdraw/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /withdraw/i })).toBeInTheDocument();
   });
 
   it("clicking harvest tab shows HarvestPanel", async () => {
     render(<App />);
     await userEvent.click(screen.getByRole("tab", { name: /harvest/i }));
-    expect(screen.getByRole("heading", { name: /harvest/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /harvest/i })).toBeInTheDocument();
   });
 
   it("clicking deposit tab after withdraw restores DepositForm", async () => {
     render(<App />);
     await userEvent.click(screen.getByRole("tab", { name: /withdraw/i }));
     await userEvent.click(screen.getByRole("tab", { name: /deposit/i }));
-    expect(screen.getByRole("heading", { name: /deposit/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: /deposit/i })).toBeInTheDocument();
   });
 
   it("withdraw tab sets aria-selected=true when active", async () => {
@@ -357,12 +376,13 @@ describe("App tab navigation", () => {
   });
 
   it("shows toast when deposit succeeds", async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     render(<App />);
-    await userEvent.type(screen.getByLabelText(/amount/i), "100");
+    // Wait for Suspense to resolve before interacting
+    const amountInput = await screen.findByLabelText(/amount/i);
+    await userEvent.type(amountInput, "100");
     await userEvent.click(screen.getByRole("button", { name: /deposit/i }));
     act(() => { vi.advanceTimersByTime(1500); });
     await waitFor(() => expect(screen.getByRole("status", { name: undefined })).toBeInTheDocument());
-    vi.useRealTimers();
   });
 });
