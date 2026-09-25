@@ -1,7 +1,6 @@
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { SWRConfig } from "swr";
 import { DepositForm } from "../components/DepositForm";
 import { WithdrawForm } from "../components/WithdrawForm";
 import { HarvestPanel } from "../components/HarvestPanel";
@@ -38,7 +37,6 @@ function renderWithdraw(onToast: ReturnType<typeof vi.fn>) {
 describe("DepositForm", () => {
   let onToast: ReturnType<typeof vi.fn>;
   beforeEach(() => { onToast = vi.fn(); });
-  // Always restore real timers after each test so fake timers don't leak
   afterEach(() => { vi.useRealTimers(); });
 
   it("renders amount input and submit button", () => {
@@ -89,26 +87,21 @@ describe("DepositForm", () => {
   });
 
   it("calls onToast with success after valid submission", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    renderDeposit(onToast);
+    render(<DepositForm onToast={onToast} />);
     await userEvent.type(screen.getByLabelText(/amount/i), "500");
     await userEvent.click(screen.getByRole("button", { name: /deposit/i }));
-    act(() => { vi.advanceTimersByTime(1500); });
     await waitFor(() => expect(onToast).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" })
-    ));
+    ), { timeout: 2000 });
   });
 
   it("clears amount after successful submission", async () => {
-    renderDeposit(onToast);
+    render(<DepositForm onToast={onToast} />);
     await userEvent.type(screen.getByLabelText(/amount/i), "100");
     await userEvent.click(screen.getByRole("button", { name: /deposit/i }));
-    // After the 1200ms simulated delay, loading stops and the form re-mounts.
-    // Query the input freshly inside waitFor so we get the new DOM element.
-    await waitFor(
-      () => expect((screen.getByLabelText(/amount/i) as HTMLInputElement).value).toBe(""),
-      { timeout: 4000 }
-    );
+    // Wait for loading skeleton to disappear and form to re-appear
+    await waitFor(() => expect(screen.queryByRole("status", { name: /loading/i })).toBeNull(), { timeout: 2000 });
+    expect((screen.getByLabelText(/amount/i) as HTMLInputElement).value).toBe("");
   });
 
   it("input has aria-invalid true when field error shown", async () => {
@@ -176,14 +169,12 @@ describe("WithdrawForm", () => {
   });
 
   it("calls onToast with success on valid submit", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
-    renderWithdraw(onToast);
+    render(<WithdrawForm onToast={onToast} />);
     await userEvent.type(screen.getByLabelText(/shares/i), "50");
     await userEvent.click(screen.getByRole("button", { name: /withdraw/i }));
-    act(() => { vi.advanceTimersByTime(1500); });
     await waitFor(() => expect(onToast).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" })
-    ));
+    ), { timeout: 2000 });
   });
 
   it("shows skeleton while loading", async () => {
@@ -239,14 +230,12 @@ describe("HarvestPanel", () => {
   });
 
   it("calls onToast with success on valid submit", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
     render(<HarvestPanel onToast={onToast} />);
     await userEvent.type(screen.getByLabelText(/yield amount/i), "200");
     await userEvent.click(screen.getByRole("button", { name: /harvest/i }));
-    act(() => { vi.advanceTimersByTime(1500); });
     await waitFor(() => expect(onToast).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success" })
-    ));
+    ), { timeout: 2000 });
   });
 
   it("shows informational description text", () => {
