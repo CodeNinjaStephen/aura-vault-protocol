@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "title": "Aura Vault Protocol",
+    "description": "Una bóveda de rendimiento basada en acciones sobre Soroban para el ecosistema Stellar."
+  },
+  "home": {
+    "heading": "Para comenzar, edita el archivo page.tsx.",
+    "body": "¿Buscas un punto de partida o más instrucciones? Visita {templatesLink} o el {learningLink}.",
+    "templates": "Plantillas",
+    "learning": "Centro de aprendizaje",
+    "faqLink": "FAQ",
+    "deployNow": "Desplegar ahora"
+  },
+  "nav": {
+    "faq": "FAQ",
+    "settings": "Configuración"
+  },
+  "notifications": {
+    "heading": "Notificaciones",
+    "markAllRead": "Marcar todas como leídas",
+    "clear": "Limpiar",
+    "empty": "Sin notificaciones",
+    "unreadAriaLabel": "Notificaciones, {count} sin leer",
+    "readAriaLabel": "Notificaciones",
+    "dismissAriaLabel": "Cerrar notificación",
+    "timestamp": "{date}"
+  },
+  "settings": {
+    "heading": "Configuración",
+    "saved": "Configuración guardada",
+    "wallet": {
+      "heading": "Billetera conectada",
+      "noWallet": "Sin billetera conectada",
+      "connect": "Conectar billetera"
+    },
+    "slippage": {
+      "heading": "Tolerancia de deslizamiento",
+      "highWarning": "Un deslizamiento alto puede resultar en operaciones desfavorables"
+    },
+    "notifications": {
+      "heading": "Notificaciones",
+      "deposits": "Confirmaciones de depósito",
+      "withdrawals": "Confirmaciones de retiro",
+      "vaultEvents": "Alertas de rendimiento de la bóveda",
+      "email": "Notificaciones por correo",
+      "emailAddress": "Dirección de correo electrónico",
+      "emailPlaceholder": "tu@ejemplo.com"
+    },
+    "security": {
+      "heading": "Seguridad",
+      "twoFactor": "Autenticación de dos factores",
+      "twoFactorDescription": "Agrega una capa extra de seguridad"
+    },
+    "danger": {
+      "heading": "Zona de peligro",
+      "description": "Desactivar tu cuenta eliminará todos los datos y no se puede deshacer.",
+      "deactivate": "Desactivar cuenta",
+      "confirmPrompt": "¿Estás seguro? Esta acción es irreversible.",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar desactivación"
+    }
+  },
+  "faq": {
+    "heading": "Preguntas frecuentes",
+    "subheading": "Todo lo que necesitas saber sobre Aura Vault Protocol.",
+    "searchPlaceholder": "Buscar preguntas\u2026",
+    "allCategory": "Todas",
+    "noResults": "No se encontraron resultados.",
+    "cantFind": "¿No encuentras tu respuesta?",
+    "openIssue": "Abre un issue en GitHub"
+  },
+  "languageSwitcher": {
+    "label": "Idioma",
+    "en": "English",
+    "es": "Español"
+  }
+}

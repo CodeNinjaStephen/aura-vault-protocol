@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "title": "Aura Vault Protocol",
+    "description": "A share-based yield vault on Soroban for the Stellar ecosystem."
+  },
+  "home": {
+    "heading": "To get started, edit the page.tsx file.",
+    "body": "Looking for a starting point or more instructions? Head over to {templatesLink} or the {learningLink}.",
+    "templates": "Templates",
+    "learning": "Learning",
+    "faqLink": "FAQ",
+    "deployNow": "Deploy Now"
+  },
+  "nav": {
+    "faq": "FAQ",
+    "settings": "Settings"
+  },
+  "notifications": {
+    "heading": "Notifications",
+    "markAllRead": "Mark all read",
+    "clear": "Clear",
+    "empty": "No notifications",
+    "unreadAriaLabel": "Notifications, {count} unread",
+    "readAriaLabel": "Notifications",
+    "dismissAriaLabel": "Dismiss notification",
+    "timestamp": "{date}"
+  },
+  "settings": {
+    "heading": "Settings",
+    "saved": "Settings saved",
+    "wallet": {
+      "heading": "Connected Wallet",
+      "noWallet": "No wallet connected",
+      "connect": "Connect Wallet"
+    },
+    "slippage": {
+      "heading": "Slippage Tolerance",
+      "highWarning": "High slippage may result in unfavorable trades"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "deposits": "Deposit confirmations",
+      "withdrawals": "Withdrawal confirmations",
+      "vaultEvents": "Vault performance alerts",
+      "email": "Email notifications",
+      "emailAddress": "Email address",
+      "emailPlaceholder": "you@example.com"
+    },
+    "security": {
+      "heading": "Security",
+      "twoFactor": "Two-Factor Authentication",
+      "twoFactorDescription": "Add an extra layer of security"
+    },
+    "danger": {
+      "heading": "Danger Zone",
+      "description": "Deactivating your account will remove all data and cannot be undone.",
+      "deactivate": "Deactivate Account",
+      "confirmPrompt": "Are you sure? This action is irreversible.",
+      "cancel": "Cancel",
+      "confirm": "Confirm Deactivation"
+    }
+  },
+  "faq": {
+    "heading": "Frequently Asked Questions",
+    "subheading": "Everything you need to know about Aura Vault Protocol.",
+    "searchPlaceholder": "Search questions\u2026",
+    "allCategory": "All",
+    "noResults": "No results found.",
+    "cantFind": "Can't find your answer?",
+    "openIssue": "Open a GitHub issue"
+  },
+  "languageSwitcher": {
+    "label": "Language",
+    "en": "English",
+    "es": "Español"
+  }
+}
