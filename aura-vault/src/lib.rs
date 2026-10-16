@@ -13,6 +13,9 @@ mod test;
 #[cfg(test)]
 mod fuzz;
 
+#[cfg(test)]
+mod security_attacks;
+
 use soroban_sdk::{contract, contractimpl, token, Address, BytesN, Env, Symbol};
 
 use storage::{
